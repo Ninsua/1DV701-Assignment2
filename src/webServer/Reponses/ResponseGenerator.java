@@ -4,14 +4,14 @@ public class ResponseGenerator {
 
     protected String responseHeader;
     // protected long contentLength;
-    protected String contentType;
+    protected ContentType contentType;
     protected String connection;
     protected String server;
     protected String status;
     protected int statusCode;
 
 
-    public ResponseGenerator(int statusCode, String contentType) {
+    public ResponseGenerator(int statusCode, ContentType contentType) {
         this.statusCode = statusCode;
         this.contentType = contentType;
     }
