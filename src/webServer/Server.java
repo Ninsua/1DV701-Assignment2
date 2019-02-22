@@ -16,7 +16,6 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -71,7 +70,7 @@ public class Server {
 				System.out.println("Server is running...");
 				
 			//Runs new task in thread from the thread pool whenever a connection is established
-			//while (true) {
+			while (true) {
 				Socket clientSocket = null;
 				try {
 					clientSocket = socket.accept();
@@ -82,10 +81,7 @@ public class Server {
 					if (DEBUG_MODE)
 						System.err.println("Could not accept connection");
 				}
-			//}
-			
-			//Kill running threads
-			threadPool.shutdownNow();
+			}
 			
 		} catch (IOException e) {
 			System.err.printf("Cannot bind to port %d", MYPORT);
