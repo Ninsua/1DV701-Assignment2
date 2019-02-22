@@ -31,7 +31,7 @@ public class GETHandler extends HTTPHandler {
 
             //Generates response header,
             //should probably use a separate class+StringBuilder to build headers dynamically
-            generateResponseHeader(requestedFile.length());
+            // generateResponseHeader(requestedFile.length());
 
             //Write header to stream
             writeStream.write(responseHeader, 0, responseHeader.length());
@@ -46,14 +46,5 @@ public class GETHandler extends HTTPHandler {
 
     }
 
-    protected String generateResponseHeader(long contentLen) {
-        responseHeader = "HTTP/1.1 200 OK" + "\n" +
-                "Server: YourWorstNightmare 0.1" + "\n" +
-                //"Content-length: "+contentLength+"\n"+
-                "Connection: close" + "\n" +
-                "Content-Type: text/html; charset=UTF-8" +
-                "\n\n";
-        return responseHeader;
-    }
 
 }
