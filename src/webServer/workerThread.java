@@ -2,8 +2,6 @@ package webServer;
 
 /*
  * Thoughts:
- * 		Have to send the length of the content in the HTTP header, how?
- * 			Get file and then get file.length, add to header.
  * 		When the pages has images, refreshing makes read stream empty, no header is sent. Why?
  */
 
@@ -11,11 +9,11 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
-import webServer.Handlers.GETHandler;
-import webServer.Handlers.HTTPHandler;
+import webServer.Handlers.*;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 
 public class workerThread implements Runnable {
@@ -27,7 +25,6 @@ public class workerThread implements Runnable {
 	private String requestHeader = "";
 	private String responseHeader;
 	private File root;
-	private String index = "index.html";
 	
 	public workerThread(Socket newClient, boolean debug, File rootDirectory) {
 		client = newClient;
@@ -51,7 +48,7 @@ public class workerThread implements Runnable {
 
 				int charsRead = 0;
 				
-				//Read HTTP header
+				//Read HTTP request header
 				do {
 					charsRead = readStream.read(inputBuffer);
 					if (charsRead > 0)
@@ -59,20 +56,35 @@ public class workerThread implements Runnable {
 				} while (charsRead != -1 && readStream.ready());
 				
 				requestHeader = recivedHeaderBuilder.toString();
-				System.out.println(requestHeader);
-				String header = requestHeader.substring(0,requestHeader.indexOf('\n'));
+				if (debug)
+					System.out.println(requestHeader);
+				
+				
+				//If the read information is not a HTTP request
+				if (!isHTTPRequest())
+					return;
 				
 				String requestType = getHTTPRequest();
 				
 				HTTPHandler handtag = null;
-				if (requestType.contentEquals("GET")) {
-					handtag = new GETHandler(client,requestHeader,root);
-					handtag.handle();
-				} else if (requestType.contentEquals("POST")) {
-				} else {
+				//Creates a relevant handler
+				try {
+					if (requestType.contentEquals("GET")) {
+						handtag = new GETHandler(client,requestHeader,root);
+					}
 					
+					else if (requestType.contentEquals("POST")) {
+						
+					}
+					
+					else if (requestType.contentEquals("PUT")) {
+						
+					}
+				} catch (FileNotFoundException e) {
+					handtag = new ErrorHandler(client,requestHeader,root);
 				}
 				
+				handtag.handle();
 				
 
 				
@@ -91,6 +103,18 @@ public class workerThread implements Runnable {
 						e.printStackTrace();
 				}
 		}
+	}
+	
+	private boolean isHTTPRequest() {
+		String[] splitHeader = requestHeader.split("\\s");
+
+		if (splitHeader.length < 3)
+			return false;
+		
+		if (!splitHeader[2].contains("HTTP"))
+			return false;
+		
+		return true;
 	}
 	
 	private String getHTTPRequest() {
