@@ -3,14 +3,12 @@ package webServer.Handlers;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
+import webServer.Reponses.*;
 
 public abstract class HTTPHandler {
 	protected static final int DEFAULT_BUFFSIZE = 1024;
@@ -19,6 +17,7 @@ public abstract class HTTPHandler {
 	protected String responseHeader;
 	protected Socket client;
 	protected File requestedFile;
+	protected ResponseGenerator responseGen;
 	
 	public abstract void handle();
 
@@ -33,9 +32,16 @@ public abstract class HTTPHandler {
 		return file;
 	}
 	
+	protected String getFileType() {
+		String[] splitString = requestedFile.getAbsolutePath().split("\\.");
+		
+		return splitString[splitString.length-1];
+	}
+	
 	//Returns path from the request header,
 	//returns index.html or index.htm if it's a DIR
 	protected String getPathFromHeader() throws IndexOutOfBoundsException {
+		String rootPath = rootDirectory.getAbsolutePath();
 		String path;
 		String[] splitHeader = requestHeader.split("\\s");
 		if (splitHeader.length < 2)
@@ -44,13 +50,10 @@ public abstract class HTTPHandler {
 		path = splitHeader[1];
 		
 		//Adds '/' to path if client did not specify
-		if (path.charAt(path.length()-1) != '/')
+		if (path.charAt(path.length()-1) != '/' && Files.isDirectory(Paths.get(rootPath+path)))
 			path += '/';
 		
-		String rootPath = rootDirectory.getAbsolutePath();
-		
 		if (Files.isDirectory(Paths.get(rootPath+path))) {
-			System.out.println("is a dir");
 			if (Files.exists(Paths.get(rootPath+path+"index.htm")) && Files.notExists(Paths.get(rootPath+path+"index.html")))
 				return path+"index.htm";
 
@@ -60,18 +63,8 @@ public abstract class HTTPHandler {
 		return path;
 	}
 	
-	protected void generateResponseHeader(boolean img) {
-		responseHeader = "HTTP/1.1 200 OK"+"\n"+
-				"Server: YourWorstNightmare 0.1"+"\n";
-		
-			if (img)
-				responseHeader += "Content-Type: image/png"+"\n";
-				
-			else
-				responseHeader += "Content-Type: text/html; charset=UTF-8"+"\n";
-				
-			responseHeader +="Connection: close"+
-					"\r\n\r\n";
+	protected void generateResponseHeader() {
+		responseHeader = responseGen.getResponseHeader();
 	}
 	
 	

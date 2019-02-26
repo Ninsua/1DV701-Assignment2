@@ -3,7 +3,7 @@ package webServer.Reponses;
 public enum StatusCodes {
 
     OK(200, "200 OK"), CREATED(201, "201 Created"), FOUND(302, "302 Found"),
-    FORBIDDEN(403, "403 Forbidden"), NOT_FOUND(404, "403 Forbidden"), SERVER_ERROR(500, "500 Internal Server Error");
+    FORBIDDEN(403, "403 Forbidden"), NOT_FOUND(404, "404 Not Found"), SERVER_ERROR(500, "500 Internal Server Error");
 
     private int code;
     private String status;
