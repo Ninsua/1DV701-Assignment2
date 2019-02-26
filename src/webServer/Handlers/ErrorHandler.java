@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
+import webServer.Reponses.ContentType;
+import webServer.Reponses.ResponseGenerator;
+import webServer.Reponses.StatusCodes;
+
 public class ErrorHandler extends HTTPHandler {
 	private String default404page;
 	
@@ -14,6 +18,10 @@ public class ErrorHandler extends HTTPHandler {
 		client = connection;
 		//Gets file, if the file or index.html/htm doesn't exist, 404 must be returned
 		requestedFile = null;
+		responseGen = new ResponseGenerator(StatusCodes.NOT_FOUND,"html");
+		generateResponseHeader();
+		
+		createDefault404page();
 	}
 
 	@Override
@@ -23,12 +31,6 @@ public class ErrorHandler extends HTTPHandler {
 
 			//Generates response header,
 			//should probably use a separate class+StringBuilder to build headers dynamically
-			
-			responseHeader = "HTTP/1.1 404 Not Found"+"\n"+
-					"Server: YourWorstNightmare 0.1"+"\n"+
-					"Content-Type: text/html; charset=UTF-8"+"\n"+
-					"Connection: close"+
-					"\r\n\r\n";
 			
 			System.out.println(responseHeader);
 			
@@ -58,5 +60,4 @@ public class ErrorHandler extends HTTPHandler {
 				"</body>\n" + 
 				"</html>";
 	}
-
 }

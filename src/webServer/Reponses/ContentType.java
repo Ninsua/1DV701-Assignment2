@@ -2,7 +2,8 @@ package webServer.Reponses;
 
 public enum ContentType {
 
-    PNG("image/png"), JPEG("image/jpeg"), HTML("text/html"), ICON("image/x-icon"), PLAIN("text/plain"), CSS("text/css");
+	//Fileformat(header text)
+    PNG("image/png"), JPEG("image/jpeg"), JPG("image/jpeg"), HTML("text/html"), ICO("image/x-icon"), TXT("text/plain"), CSS("text/css");
 
     private String type;
 

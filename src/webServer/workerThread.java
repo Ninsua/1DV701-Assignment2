@@ -85,9 +85,7 @@ public class workerThread implements Runnable {
 				}
 				
 				handtag.handle();
-				
 
-				
 				
 			} catch (IOException e) {
 				if (debug)

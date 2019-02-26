@@ -7,6 +7,10 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.security.AccessControlException;
 
+import webServer.Reponses.ContentType;
+import webServer.Reponses.ResponseGenerator;
+import webServer.Reponses.StatusCodes;
+
 public class GETHandler extends HTTPHandler {
 
 	public GETHandler(Socket connection,String header, File rootDIR) throws FileNotFoundException {
@@ -17,11 +21,12 @@ public class GETHandler extends HTTPHandler {
 		requestedFile = getFile(
 				rootDirectory.getAbsolutePath()+getPathFromHeader()
 				);
-		//System.out.println(getPathFromHeader());
+		System.out.println(requestedFile.getAbsolutePath());
+		responseGen = new ResponseGenerator(StatusCodes.OK,getFileType());
+		generateResponseHeader();
 	}
 	
 	public void handle() throws AccessControlException {
-		
 		//This does work
 		if (!requestedFile.canRead()) {
 			//Throw error for 403 header
@@ -33,13 +38,6 @@ public class GETHandler extends HTTPHandler {
 
 			//Generates response header,
 			//should probably use a separate class+StringBuilder to build headers dynamically
-			
-			String[] pathArray = requestHeader.split("\\s")[1].split("/");
-			if (pathArray.length > 0 && pathArray[pathArray.length-1].contains(".png"))
-				generateResponseHeader(true);
-			
-			else
-				generateResponseHeader(false);
 			
 			System.out.println(responseHeader);
 			
