@@ -5,7 +5,7 @@ public class ResponseGenerator {
     private String status;
     private ContentType contentType;
 
-    public ResponseGenerator(StatusCodes status, String type) {
+    public ResponseGenerator(StatusCodes status, String type) throws IllegalArgumentException {
         this.status = status.getStatus();
         this.contentType = fileExtensionToContentType(type);
         responseHeader = new StringBuilder();
