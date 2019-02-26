@@ -68,7 +68,7 @@ public abstract class HTTPHandler {
 	}
 	
 	
-	//Should this really write char? Because images are not chars, should write bytes maybe.
+	//Writes a file to stream
 	protected void writeFileToStream(File file) throws FileNotFoundException {
 		FileInputStream fileReader = new FileInputStream(file);
 		OutputStream outStream;
@@ -93,6 +93,19 @@ public abstract class HTTPHandler {
 			} catch (IOException e) {
 					e.printStackTrace();
 			}
+		}
+	}
+	
+	//Writes a bytes to stream, should have used buffer here?
+	protected void writeBytesToStream(byte[] data) {
+		OutputStream outStream;
+		
+		try {
+			outStream = client.getOutputStream();
+
+			outStream.write(data);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
