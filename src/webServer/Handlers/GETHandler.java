@@ -12,8 +12,8 @@ import webServer.Reponses.ResponseGenerator;
 import webServer.Reponses.StatusCodes;
 
 public class GETHandler extends HTTPHandler {
-
-	public GETHandler(Socket connection,String header, File rootDIR) throws FileNotFoundException {
+	
+	public GETHandler(Socket connection,String header, File rootDIR) throws FileNotFoundException, IllegalArgumentException {
 		rootDirectory = rootDIR;
 		requestHeader = header;
 		client = connection;
@@ -21,13 +21,18 @@ public class GETHandler extends HTTPHandler {
 		requestedFile = getFile(
 				rootDirectory.getAbsolutePath()+getPathFromHeader()
 				);
+		//To be deleted
 		System.out.println(requestedFile.getAbsolutePath());
+		
+		//Look for supported filetypes
 		responseGen = new ResponseGenerator(StatusCodes.OK,getFileType());
 		generateResponseHeader();
 	}
 	
 	public void handle() throws AccessControlException {
 		//This does work
+		
+		System.out.println(requestedFile.canRead());
 		if (!requestedFile.canRead()) {
 			//Throw error for 403 header
 			throw new AccessControlException("Cannot read file");
@@ -46,7 +51,7 @@ public class GETHandler extends HTTPHandler {
 			writeStream.flush();
 			
 			//Write file to stream
-			writeFileToStream(requestedFile);
+			writeFileToStream(requestedFile);			
 			writeStream.flush();
 		} catch (IOException e) {
 			e.printStackTrace();

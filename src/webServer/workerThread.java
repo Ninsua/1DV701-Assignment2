@@ -8,8 +8,10 @@ package webServer;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.security.AccessControlException;
 
 import webServer.Handlers.*;
+import webServer.Reponses.StatusCodes;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -39,7 +41,7 @@ public class workerThread implements Runnable {
 				int bufferOffset = 0;
 				
 				//Set socket timeout to 10 seconds
-				client.setSoTimeout((int)A_SECOND*10);
+				//client.setSoTimeout((int)A_SECOND*10);
 				
 				BufferedReader readStream = new BufferedReader(new InputStreamReader(client.getInputStream()));
 				OutputStreamWriter writeStream = new OutputStreamWriter(client.getOutputStream());
@@ -66,11 +68,11 @@ public class workerThread implements Runnable {
 				
 				String requestType = getHTTPRequest();
 				
-				HTTPHandler handtag = null;
+				HTTPHandler handler = null;
 				//Creates a relevant handler
 				try {
 					if (requestType.contentEquals("GET")) {
-						handtag = new GETHandler(client,requestHeader,root);
+						handler = new GETHandler(client,requestHeader,root);
 					}
 					
 					else if (requestType.contentEquals("POST")) {
@@ -81,10 +83,23 @@ public class workerThread implements Runnable {
 						
 					}
 				} catch (FileNotFoundException e) {
-					handtag = new ErrorHandler(client,requestHeader,root);
+					//404 File not found
+					handler = new ErrorHandler(client,requestHeader,root,StatusCodes.NOT_FOUND);
+				} catch (IllegalArgumentException e) {
+					//500 Internal server error
+					//Unsupported filetype
+					handler = new ErrorHandler(client,requestHeader,root,StatusCodes.SERVER_ERROR);
 				}
 				
-				handtag.handle();
+				//For potential handle errors
+				try {
+					handler.handle();
+				} catch (AccessControlException e) {
+					//403 Forbidden
+					handler = new ErrorHandler(client,requestHeader,root,StatusCodes.FORBIDDEN);
+					handler.handle();
+				}
+				
 
 				
 			} catch (IOException e) {

@@ -5,23 +5,28 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
-import webServer.Reponses.ContentType;
 import webServer.Reponses.ResponseGenerator;
 import webServer.Reponses.StatusCodes;
 
 public class ErrorHandler extends HTTPHandler {
-	private String default404page;
+	private String defaultErrorHTML;
 	
-	public ErrorHandler(Socket connection,String header, File rootDIR) {
+	
+	public ErrorHandler(Socket connection,String header, File rootDIR, StatusCodes statusCode) {
 		rootDirectory = rootDIR;
 		requestHeader = header;
 		client = connection;
 		//Gets file, if the file or index.html/htm doesn't exist, 404 must be returned
 		requestedFile = null;
-		responseGen = new ResponseGenerator(StatusCodes.NOT_FOUND,"html");
+		responseGen = new ResponseGenerator(statusCode,"html");
 		generateResponseHeader();
 		
-		createDefault404page();
+		if (statusCode == StatusCodes.NOT_FOUND)
+			createDefault404page();
+		else if (statusCode == StatusCodes.FORBIDDEN)
+			createDefault403page();
+		else
+			createDefault500page();
 	}
 
 	@Override
@@ -36,7 +41,7 @@ public class ErrorHandler extends HTTPHandler {
 			
 			//Write header to stream
 			writeStream.write(responseHeader, 0, responseHeader.length());
-			writeStream.write(default404page, 0, default404page.length());
+			writeStream.write(defaultErrorHTML, 0, defaultErrorHTML.length());
 			writeStream.flush();
 			
 			//Write file to stream
@@ -49,7 +54,7 @@ public class ErrorHandler extends HTTPHandler {
 	
 	private void createDefault404page() {
 		String path = getPathFromHeader();
-		default404page =
+		defaultErrorHTML =
 				"<html>\n" + 
 				"<head>\n" + 
 				"   <title>404 Not Found</title>\n" + 
@@ -57,6 +62,33 @@ public class ErrorHandler extends HTTPHandler {
 				"<body>\n" + 
 				"   <h1>Not Found</h1>\n" + 
 				"   <p>The requested URL "+path+" was not found on this server.</p>\n" + 
+				"</body>\n" + 
+				"</html>";
+	}
+	
+	private void createDefault500page() {
+		defaultErrorHTML =
+				"<html>\n" + 
+				"<head>\n" + 
+				"   <title>500 Internal Server Error</title>\n" + 
+				"</head>\n" + 
+				"<body>\n" + 
+				"   <h1>500 Internal Server Error</h1>\n" + 
+				"   <p>The server encountered an unexpected condition that prevented it from fullfilling the request.</p>\n" + 
+				"</body>\n" + 
+				"</html>";
+	}
+	
+	private void createDefault403page() {
+		String path = getPathFromHeader();
+		defaultErrorHTML =
+				"<html>\n" + 
+				"<head>\n" + 
+				"   <title>403 Forbidden</title>\n" + 
+				"</head>\n" + 
+				"<body>\n" + 
+				"   <h1>403 Forbidden</h1>\n" + 
+				"   <p>You don't have permission to access/modify "+path+" on this server</p>\n" + 
 				"</body>\n" + 
 				"</html>";
 	}
