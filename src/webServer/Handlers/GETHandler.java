@@ -7,8 +7,6 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.security.AccessControlException;
 
-import webServer.Server;
-import webServer.Reponses.ContentType;
 import webServer.Reponses.ResponseGenerator;
 import webServer.Reponses.StatusCodes;
 
@@ -33,7 +31,6 @@ public class GETHandler extends HTTPHandler {
 	public void handle() throws AccessControlException {
 		//The canRead() method is broken on Windows. See report.
 		//Should work with "-rwx------ root nobody" fs permissions on Unix-like OSes
-		System.out.println(requestedFile.canRead());
 		if (!requestedFile.canRead()) {
 			//Throw error for 403 header
 			throw new AccessControlException("Cannot read file");
@@ -45,12 +42,12 @@ public class GETHandler extends HTTPHandler {
 			//Generates response header,
 			//should probably use a separate class+StringBuilder to build headers dynamically
 			
+			//To remove
 			System.out.println(responseHeader);
 
 			//Write header to stream
 			writeStream.write(responseHeader, 0, responseHeader.length());
 			writeStream.flush();
-			
 			//Write file to stream
 			writeFileToStream(requestedFile);			
 			writeStream.flush();
