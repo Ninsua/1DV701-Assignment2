@@ -63,8 +63,11 @@ public class workerThread implements Runnable {
 				
 				
 				//If the read information is not a HTTP request
-				if (!isHTTPRequest())
+				if (!isHTTPRequest()) {
+					System.err.println("Not an HTTP request");
+					client.close();
 					return;
+				}
 				
 				String requestType = getHTTPRequest();
 				

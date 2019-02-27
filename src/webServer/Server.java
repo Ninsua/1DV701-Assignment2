@@ -30,6 +30,7 @@ public class Server {
 	public static void main(String[] args) {
 		ExecutorService threadPool;
     	MYPORT = DEFAULT_SERVER_PORT;
+    	ServerSocket socket;
     	String rootPath;
     	
     	//Check and set arguments
@@ -56,7 +57,6 @@ public class Server {
     	}
     	
     	threadPool = Executors.newFixedThreadPool(MAX_THREADS);
-    	ServerSocket socket;
     	rootPath = args[0];
     	
     	File rootDirectory = new File(rootPath);
