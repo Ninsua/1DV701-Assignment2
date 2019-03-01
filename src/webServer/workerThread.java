@@ -20,7 +20,6 @@ import java.io.InputStreamReader;
 
 public class workerThread implements Runnable {
 	private boolean debug;
-	private static final double A_SECOND = 1000;
 	private static final int DEFAULT_BUFFSIZE = 1024;
 	private Socket client;
 	private char[] inputBuffer = new char[DEFAULT_BUFFSIZE];
@@ -37,15 +36,8 @@ public class workerThread implements Runnable {
 	
 	@Override
 	public void run() {
-			try {
-				int bufferOffset = 0;
-				
-				//Set socket timeout to 10 seconds
-				//client.setSoTimeout((int)A_SECOND*10);
-				
+			try {				
 				BufferedReader readStream = new BufferedReader(new InputStreamReader(client.getInputStream()));
-				OutputStreamWriter writeStream = new OutputStreamWriter(client.getOutputStream());
-				
 				StringBuilder recivedHeaderBuilder = new StringBuilder();
 
 				int charsRead = 0;
@@ -63,15 +55,23 @@ public class workerThread implements Runnable {
 				
 				
 				//If the read information is not a HTTP request
-				if (!isHTTPRequest())
+				if (!isHTTPRequest()) {
+					System.err.println("Not an HTTP request");
+					client.close();
 					return;
+				}
 				
 				String requestType = getHTTPRequest();
 				
 				HTTPHandler handler = null;
 				//Creates a relevant handler
 				try {
-					if (requestType.contentEquals("GET")) {
+					//Hardcoded redirect
+					if (getPathFromHeader().contentEquals("/")) {
+						handler = new RedirectHandler(client,requestHeader,root,StatusCodes.FOUND);
+					}
+					
+					else if (requestType.contentEquals("GET")) {
 						handler = new GETHandler(client,requestHeader,root);
 					}
 					
@@ -137,6 +137,15 @@ public class workerThread implements Runnable {
 			throw new IndexOutOfBoundsException();
 		
 		return splitHeader[0];
+	}
+	
+	private String getPathFromHeader() {
+		String[] splitHeader = requestHeader.split("\\s");
+
+		if (splitHeader.length < 1)
+			throw new IndexOutOfBoundsException();
+		
+		return splitHeader[1];
 	}
 	
 }

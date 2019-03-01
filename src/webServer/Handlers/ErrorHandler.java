@@ -60,7 +60,7 @@ public class ErrorHandler extends HTTPHandler {
 				"   <title>404 Not Found</title>\n" + 
 				"</head>\n" + 
 				"<body>\n" + 
-				"   <h1>Not Found</h1>\n" + 
+				"   <h1>404 Not Found</h1>\n" + 
 				"   <p>The requested URL "+path+" was not found on this server.</p>\n" + 
 				"</body>\n" + 
 				"</html>";
