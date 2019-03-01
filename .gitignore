@@ -1,1 +1,6 @@
+/out/
 /bin/
+/.idea/
+/META-INF/
+*.classpath
+*.project
