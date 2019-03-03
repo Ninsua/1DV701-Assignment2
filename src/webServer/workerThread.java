@@ -28,11 +28,16 @@ public class workerThread implements Runnable {
 			StringBuilder recivedHeaderBuilder = new StringBuilder();
 
 			// Read HTTP request header
-			String line;
-			do {
-				line = readStream.readLine();
-				recivedHeaderBuilder.append(line).append("\r\n");
-			} while (line.getBytes().length != 0);
+			try {
+				String line;
+				do {
+					line = readStream.readLine();
+					recivedHeaderBuilder.append(line).append("\r\n");
+				} while (line.getBytes().length != 0);
+			} catch (NullPointerException e) {
+				throw new IOException();
+			}
+
 
 			requestHeader = recivedHeaderBuilder.toString();
 
@@ -92,7 +97,7 @@ public class workerThread implements Runnable {
 			}
 
 		} catch (IOException e) {
-			System.err.printf("Could not send data to %s on port %d \n", client.getInetAddress().getHostAddress(),
+			System.err.printf("Could not read data to %s on port %d \n", client.getInetAddress().getHostAddress(),
 					client.getPort());
 		} finally {
 			try {
